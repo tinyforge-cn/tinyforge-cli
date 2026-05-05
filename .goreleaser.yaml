@@ -39,9 +39,6 @@ archives:
     formats: [binary]
     name_template: "bootcraft-{{ .Os }}-{{ .Arch }}"
 
-extra_files:
-  - glob: scripts/install.sh
-
 checksum:
   name_template: "checksums.txt"
   algorithm: sha256
@@ -53,16 +50,19 @@ release:
   draft: false
   prerelease: auto
   name_template: "v{{ .Version }}"
+  extra_files:
+    - glob: scripts/install.sh
   header: |
     ## bootcraft-cli {{ .Tag }}
 
-    安装(Linux/macOS):
-
+    **macOS / Linux:**
     ```bash
-    OS=$(uname -s | tr '[:upper:]' '[:lower:]')   # linux / darwin
-    ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
-    curl -fsSL "https://github.com/bootcraft-cn/bootcraft-cli/releases/download/{{ .Tag }}/bootcraft-${OS}-${ARCH}" \
-      -o /usr/local/bin/bootcraft && chmod +x /usr/local/bin/bootcraft
+    curl -fsSL https://github.com/bootcraft-cn/bootcraft-cli/releases/latest/download/install.sh | sh
+    ```
+
+    **Windows (PowerShell):**
+    ```powershell
+    irm https://github.com/bootcraft-cn/bootcraft-cli/releases/latest/download/bootcraft-windows-amd64.exe -OutFile bootcraft.exe
     ```
 
 changelog:
