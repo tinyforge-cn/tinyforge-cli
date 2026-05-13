@@ -22,21 +22,27 @@ type ghRelease struct {
 
 const testerCacheTTL = 24 * time.Hour
 
-// ensureTester ensures the tester binary for the given course is cached locally
-// and up-to-date. Returns the absolute path to the binary.
+// ensureTester ensures the tester for the given course is ready to run.
+// On macOS/Linux it caches the native binary and returns a binaryRunner.
+// On Windows it resolves the Docker image version and returns a dockerRunner
+// (no binary is downloaded; Docker must be installed by the user).
 //
-// Cache layout:
+// Cache layout (macOS/Linux):
 //
 //	~/.tinycs/testers/<course>/tester        (binary)
 //	~/.tinycs/testers/<course>/meta.json     (version + cached_at)
-func ensureTester(course string) (string, error) {
+func ensureTester(course string) (testerRunner, error) {
+	if runtime.GOOS == "windows" {
+		return ensureTesterDocker(course)
+	}
+	return ensureTesterBinary(course)
+}
+
+func ensureTesterBinary(course string) (testerRunner, error) {
 	home, _ := os.UserHomeDir()
 	cacheDir := filepath.Join(home, ".tinycs", "testers", course)
 	metaPath := filepath.Join(cacheDir, "meta.json")
 	testerPath := filepath.Join(cacheDir, "tester")
-	if runtime.GOOS == "windows" {
-		testerPath += ".exe"
-	}
 
 	// 1. Read local meta.
 	var meta testerMeta
@@ -47,7 +53,7 @@ func ensureTester(course string) (string, error) {
 	// 2. If within TTL and binary exists, return immediately.
 	if meta.Version != "" && time.Since(meta.CachedAt) < testerCacheTTL {
 		if _, err := os.Stat(testerPath); err == nil {
-			return testerPath, nil
+			return &binaryRunner{path: testerPath}, nil
 		}
 	}
 
@@ -58,10 +64,10 @@ func ensureTester(course string) (string, error) {
 		if meta.Version != "" {
 			if _, serr := os.Stat(testerPath); serr == nil {
 				fmt.Printf("⚠️  无法查询最新版本，使用缓存版本 %s\n", meta.Version)
-				return testerPath, nil
+				return &binaryRunner{path: testerPath}, nil
 			}
 		}
-		return "", fmt.Errorf("查询 %s-tester 最新版本失败: %w", course, err)
+		return nil, fmt.Errorf("查询 %s-tester 最新版本失败: %w", course, err)
 	}
 
 	// 4. If already on the latest version, refresh cached_at and return.
@@ -69,14 +75,14 @@ func ensureTester(course string) (string, error) {
 		if _, err := os.Stat(testerPath); err == nil {
 			meta.CachedAt = time.Now()
 			_ = saveTesterMeta(metaPath, meta)
-			return testerPath, nil
+			return &binaryRunner{path: testerPath}, nil
 		}
 	}
 
 	// 5. Download the new binary.
 	platform, err := testerPlatform()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	fname := fmt.Sprintf("%s-tester-%s", course, platform)
 	dlURL := fmt.Sprintf(
@@ -86,14 +92,47 @@ func ensureTester(course string) (string, error) {
 
 	fmt.Printf("📦 下载 %s-tester %s ...\n", course, latest)
 	if err := downloadTesterBinary(dlURL, testerPath); err != nil {
-		return "", fmt.Errorf("下载 %s-tester 失败: %w", course, err)
+		return nil, fmt.Errorf("下载 %s-tester 失败: %w", course, err)
 	}
 
 	meta.Version = latest
 	meta.CachedAt = time.Now()
 	_ = saveTesterMeta(metaPath, meta)
 
-	return testerPath, nil
+	return &binaryRunner{path: testerPath}, nil
+}
+
+// ensureTesterDocker resolves the latest tester version and returns a dockerRunner.
+// The Docker image is pulled on demand by the Docker daemon — no local caching needed here.
+func ensureTesterDocker(course string) (testerRunner, error) {
+	home, _ := os.UserHomeDir()
+	metaPath := filepath.Join(home, ".tinycs", "testers", course, "meta.json")
+
+	var meta testerMeta
+	if data, err := os.ReadFile(metaPath); err == nil {
+		_ = json.Unmarshal(data, &meta)
+	}
+
+	if meta.Version != "" && time.Since(meta.CachedAt) < testerCacheTTL {
+		return &dockerRunner{course: course, version: meta.Version}, nil
+	}
+
+	latest, err := fetchLatestTesterRelease(course)
+	if err != nil {
+		if meta.Version != "" {
+			fmt.Printf("⚠️  无法查询最新版本，使用缓存版本 %s\n", meta.Version)
+			return &dockerRunner{course: course, version: meta.Version}, nil
+		}
+		return nil, fmt.Errorf("查询 %s-tester 最新版本失败: %w", course, err)
+	}
+
+	meta.Version = latest
+	meta.CachedAt = time.Now()
+	_ = saveTesterMeta(metaPath, meta)
+
+	fmt.Printf("🐳 Windows 模式：使用 Docker 运行 %s-tester %s\n", course, latest)
+	fmt.Println("   首次运行将自动拉取镜像（约 50MB），请确保 Docker Desktop 已启动。")
+	return &dockerRunner{course: course, version: latest}, nil
 }
 
 func fetchLatestTesterRelease(course string) (string, error) {

@@ -5,8 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
-	"os/exec"
 
 	"github.com/tinycs-cn/cli/internal/client"
 	"github.com/tinycs-cn/cli/internal/config"
@@ -49,34 +47,30 @@ func TestCommand(args []string) error {
 		return err
 	}
 
-	// 3. Resolve tester binary
-	testerBin := *localTester
-	if testerBin == "" {
-		testerBin, err = ensureTester(course)
+	// 3. Resolve tester runner
+	var runner testerRunner
+	if *localTester != "" {
+		runner = &binaryRunner{path: *localTester}
+	} else {
+		runner, err = ensureTester(course)
 		if err != nil {
 			return err
 		}
 	}
 
-	// 4. Build tester arguments
-	cmdArgs := []string{"-d", projectDir}
-	if *stage != "" {
-		cmdArgs = append(cmdArgs, "-s", *stage)
-	} else if !*all {
-		slug, err := resolveCurrentStageFromAPI(course, language, cfg, *apiURL)
+	// 4. Resolve stage slug
+	stageSlug := *stage
+	if stageSlug == "" && !*all {
+		stageSlug, err = resolveCurrentStageFromAPI(course, language, cfg, *apiURL)
 		if err != nil {
 			return err
 		}
-		cmdArgs = append(cmdArgs, "-s", slug)
 	}
 
 	// 5. Run tester
 	fmt.Println("🧪 本地评测（结果不计入提交记录）")
 	fmt.Println()
-	cmd := exec.Command(testerBin, cmdArgs...) //nolint:gosec — path resolved from trusted cache
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return runner.Run(projectDir, stageSlug, *all)
 }
 
 // resolveCurrentStageFromAPI calls GET /v1/current-stage?course=&language= and
