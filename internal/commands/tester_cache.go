@@ -23,16 +23,15 @@ type ghRelease struct {
 const testerCacheTTL = 24 * time.Hour
 
 // ensureTester ensures the tester for the given course is ready to run.
-// On macOS/Linux it caches the native binary and returns a binaryRunner.
-// On Windows it resolves the Docker image version and returns a dockerRunner
-// (no binary is downloaded; Docker must be installed by the user).
+// On Windows, or when useDocker is true, it returns a dockerRunner.
+// Otherwise it caches the native binary and returns a binaryRunner.
 //
 // Cache layout (macOS/Linux):
 //
 //	~/.tinycs/testers/<course>/tester        (binary)
 //	~/.tinycs/testers/<course>/meta.json     (version + cached_at)
-func ensureTester(course string) (testerRunner, error) {
-	if runtime.GOOS == "windows" {
+func ensureTester(course string, useDocker bool) (testerRunner, error) {
+	if useDocker || runtime.GOOS == "windows" {
 		return ensureTesterDocker(course)
 	}
 	return ensureTesterBinary(course)

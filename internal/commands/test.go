@@ -15,7 +15,8 @@ import (
 // Flow:
 //  1. Load auth token — required for stage inference.
 //  2. Resolve course + language + project dir (same as submit).
-//  3. Resolve tester binary: --tester-path if given, else ensureTester (cache+download).
+//  3. Resolve tester: --tester-path forces binary; --docker forces Docker;
+//     otherwise auto-select (Windows → Docker, macOS/Linux → binary).
 //  4. Resolve stage slug:
 //     a. --stage <slug>  → use as-is
 //     b. --all           → omit -s, tester runs all stages
@@ -26,6 +27,7 @@ func TestCommand(args []string) error {
 	stage := flags.String("stage", "", "指定评测关卡 (slug)")
 	all := flags.Bool("all", false, "测试所有关卡")
 	localTester := flags.String("tester-path", "", "直接指定本地 tester 二进制路径（调试用）")
+	useDocker := flags.Bool("docker", false, "使用 Docker 容器运行 tester（macOS/Linux 可选，Windows 默认）")
 	apiURL := flags.String("api-url", "", "API 地址（内部测试用）")
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -52,7 +54,7 @@ func TestCommand(args []string) error {
 	if *localTester != "" {
 		runner = &binaryRunner{path: *localTester}
 	} else {
-		runner, err = ensureTester(course)
+		runner, err = ensureTester(course, *useDocker)
 		if err != nil {
 			return err
 		}
