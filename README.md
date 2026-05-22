@@ -1,38 +1,38 @@
-# tinycs-cli
+# tinyforge-cli
 
-[![CI](https://github.com/tinycs-cn/tinycs-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/tinycs-cn/tinycs-cli/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/tinycs-cn/tinycs-cli?logo=github)](https://github.com/tinycs-cn/tinycs-cli/releases/latest)
+[![CI](https://github.com/tinyforge-cn/tinyforge-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/tinyforge-cn/tinyforge-cli/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/tinyforge-cn/tinyforge-cli?logo=github)](https://github.com/tinyforge-cn/tinyforge-cli/releases/latest)
 
-Tinycs 平台命令行工具，用于提交课程代码并获取实时评测结果。
+Tinyforge 平台命令行工具，用于提交课程代码并获取实时评测结果。
 
 ## 安装
 
 ### macOS / Linux（推荐）
 
 ```bash
-curl -fsSL https://github.com/tinycs-cn/tinycs-cli/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/install.sh | sh
 ```
 
 ### Windows（PowerShell）
 
 ```powershell
-irm https://github.com/tinycs-cn/tinycs-cli/releases/latest/download/tinycs-windows-amd64.exe -OutFile "$env:USERPROFILE\tinycs.exe"
+irm https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/tinyforge-windows-amd64.exe -OutFile "$env:USERPROFILE\tinyforge.exe"
 ```
 
-> 下载后将 `tinycs.exe` 所在目录加入系统 PATH，或移动到已在 PATH 中的目录。
+> 下载后将 `tinyforge.exe` 所在目录加入系统 PATH，或移动到已在 PATH 中的目录。
 
-> **`tinycs test` 在 Windows 上通过 Docker 容器运行评测器，需安装 [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) 并确保其已启动。**
+> **`tinyforge test` 在 Windows 上通过 Docker 容器运行评测器，需安装 [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) 并确保其已启动。**
 
 ### 从源码构建（需 Go 1.23+，三端通用）
 
 ```bash
-go install github.com/tinycs-cn/tinycs-cli/cmd/tinycs@latest
+go install github.com/tinyforge-cn/tinyforge-cli/cmd/tinyforge@latest
 ```
 
 安装完成后验证：
 
 ```bash
-tinycs version
+tinyforge version
 ```
 
 ## 快速上手
@@ -41,15 +41,15 @@ tinycs version
 
 ```bash
 # 浏览器授权登录（推荐）
-tinycs login
+tinyforge login
 
 # 或使用 Token 登录
-tinycs login --token tcs_xxx
+tinyforge login --token tcs_xxx
 ```
 
 ### 2. 进入课程目录
 
-课程目录中需要有 `tinycs.yml` 文件：
+课程目录中需要有 `tinyforge.yml` 文件：
 
 ```yaml
 course: tinydsa
@@ -59,20 +59,20 @@ language: python
 ### 3. 提交代码
 
 ```bash
-tinycs submit
+tinyforge submit
 ```
 
 提交后 CLI 会实时输出评测日志，评测通过时自动解锁下一关。
 
 ## 命令参考
 
-### `tinycs login`
+### `tinyforge login`
 
 | 选项              | 说明                                |
 | ----------------- | ----------------------------------- |
 | `--token <token>` | 使用 API Token 登录，跳过浏览器授权 |
 
-### `tinycs submit`
+### `tinyforge submit`
 
 | 选项              | 说明                   |
 | ----------------- | ---------------------- |
@@ -80,7 +80,7 @@ tinycs submit
 | `--dry-run`       | 仅预览打包文件，不上传 |
 | `--message <msg>` | 自定义提交备注         |
 
-### `tinycs test`
+### `tinyforge test`
 
 在本地运行评测（结果不计入提交记录）。
 
@@ -91,17 +91,17 @@ tinycs submit
 | `--docker`             | 强制使用 Docker 容器运行 tester（macOS/Linux 可选，Windows 默认） |
 | `--tester-path <path>` | 直接指定本地 tester 路径（调试用）                                |
 
-tester 按课程独立缓存在 `~/.tinycs/testers/<course>/`，首次运行自动从 GitHub Releases 下载，24 小时内复用缓存。Windows 上改用 Docker 镜像（`ghcr.io/tinycs-cn/<course>-tester`），无需下载二进制。
+tester 按课程独立缓存在 `~/.tinyforge/testers/<course>/`，首次运行自动从 GitHub Releases 下载，24 小时内复用缓存。Windows 上改用 Docker 镜像（`ghcr.io/tinyforge-cn/<course>-tester`），无需下载二进制。
 
-### `tinycs stages`
+### `tinyforge stages`
 
 列出当前课程的所有关卡序号、Slug 和名称。
 
 ```bash
-tinycs stages
+tinyforge stages
 ```
 
-### `tinycs version`
+### `tinyforge version`
 
 显示版本号和构建信息。
 
@@ -123,12 +123,12 @@ tinycs stages
 
 | 变量           | 说明                                   |
 | -------------- | -------------------------------------- |
-| `TINYCS_TOKEN` | API Token，优先于配置文件（适用于 CI） |
+| `TINYFORGE_TOKEN` | API Token，优先于配置文件（适用于 CI） |
 | `NO_COLOR`     | 设置后禁用彩色输出                     |
 
 ## 配置文件
 
-登录后凭证保存在 `~/.tinycs/config.yml`（权限 `0600`）。
+登录后凭证保存在 `~/.tinyforge/config.yml`（权限 `0600`）。
 
 ## 发布流程（维护者）
 
@@ -142,7 +142,7 @@ tinycs stages
 
 3. `.github/workflows/release.yml` 会自动跑 GoReleaser，产出多平台二进制 + checksums，发到 GitHub Releases
 
-4. 学员 starter 的 `tinycs-submit.yml` 默认拉 `releases/latest/download/tinycs-linux-amd64`，发布后立刻生效
+4. 学员 starter 的 `tinyforge-submit.yml`，发布后立刻生效
 
 **本地预演**（无需打 tag、不会 push）：
 

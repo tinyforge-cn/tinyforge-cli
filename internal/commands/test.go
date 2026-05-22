@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tinycs-cn/cli/internal/client"
-	"github.com/tinycs-cn/cli/internal/config"
+	"github.com/tinyforge-cn/cli/internal/client"
+	"github.com/tinyforge-cn/cli/internal/config"
 )
 
-// TestCommand implements "tinycs test".
+// TestCommand implements "tinyforge test".
 //
 // Flow:
 //  1. Load auth token — required for stage inference.
@@ -40,7 +40,7 @@ func TestCommand(args []string) error {
 	}
 	token := cfg.GetToken()
 	if token == "" {
-		return errors.New("未登录，请先运行: tinycs login")
+		return errors.New("未登录，请先运行: tinyforge login")
 	}
 
 	// 2. Resolve course + language + project dir
@@ -88,11 +88,11 @@ func resolveCurrentStageFromAPI(course, language string, cfg *config.Config, api
 			switch apiErr.StatusCode {
 			case http.StatusBadRequest:
 				return "", fmt.Errorf(
-					"该课程为随机挑战模式，请用 --stage <slug> 指定关卡\n运行 tinycs stages 查看可用关卡",
+					"该课程为随机挑战模式，请用 --stage <slug> 指定关卡\n运行 tinyforge stages 查看可用关卡",
 				)
 			case http.StatusNotFound:
 				return "", fmt.Errorf(
-					"未找到该课程的注册记录，请先到 https://www.tinycs.cn 注册仓库后再运行",
+					"未找到该课程的注册记录，请先到 https://www.tinyforge.cn 注册仓库后再运行",
 				)
 			}
 		}

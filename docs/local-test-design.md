@@ -1,27 +1,27 @@
-# tinycs test — 本地评测命令设计
+# tinyforge test — 本地评测命令设计
 
 ## 背景
 
-`tinycs submit` 将代码推送到远程服务器评测，每次需要网络且有延迟。
+`tinyforge submit` 将代码推送到远程服务器评测，每次需要网络且有延迟。
 tester 二进制（如 `tinynum-tester`）已支持本地运行：
 
 ```
 tester -d <project-dir> [-s <stage-slug>]
 ```
 
-`tinycs test` 命令封装这一能力，让学生在提交前本地快速验证。
+`tinyforge test` 命令封装这一能力，让学生在提交前本地快速验证。
 
 ---
 
 ## 命令设计
 
 ```
-tinycs test                      # 测试当前关卡
-tinycs test --stage <slug>       # 指定关卡
-tinycs test --all                # 测试所有关卡
+tinyforge test                      # 测试当前关卡
+tinyforge test --stage <slug>       # 指定关卡
+tinyforge test --all                # 测试所有关卡
 ```
 
-读取当前目录的 `tinycs.yml` 获取 `course` 和 `language`，与 `tinycs submit` 保持一致。
+读取当前目录的 `tinyforge.yml` 获取 `course` 和 `language`，与 `tinyforge submit` 保持一致。
 
 ---
 
@@ -30,27 +30,27 @@ tinycs test --all                # 测试所有关卡
 ### 缓存路径
 
 ```
-~/.tinycs/testers/<course>/<version>/tester
+~/.tinyforge/testers/<course>/<version>/tester
 ```
 
-示例：`~/.tinycs/testers/tinynum/v0.4.0/tester`
+示例：`~/.tinyforge/testers/tinynum/v0.4.0/tester`
 
 ### 版本信息来源：GitHub Releases
 
-tester 每门课对应一个独立 GitHub 仓库（如 `tinycs-cn/tinynum-tester`），按 tag 发布。
-版本管理完全依赖 GitHub Releases，**无需 tinycs-api 新增任何端点**。
+tester 每门课对应一个独立 GitHub 仓库（如 `tinyforge-cn/tinynum-tester`），按 tag 发布。
+版本管理完全依赖 GitHub Releases，**无需 tinyforge-api 新增任何端点**。
 
 - **查询最新版本**：
 
   ```
-  GET https://api.github.com/repos/tinycs-cn/{course}-tester/releases/latest
+  GET https://api.github.com/repos/tinyforge-cn/{course}-tester/releases/latest
   → { "tag_name": "v0.4.0", "assets": [{"name": "tinynum-tester-darwin-arm64", "browser_download_url": "..."}] }
   ```
 
 - **下载 URL 规律**（直接构造，无需解析 assets）：
 
   ```
-  https://github.com/tinycs-cn/{course}-tester/releases/download/{tag}/{course}-tester-{platform}
+  https://github.com/tinyforge-cn/{course}-tester/releases/download/{tag}/{course}-tester-{platform}
   ```
 
 - **TTL**：本地缓存 meta.json 记录版本号，24h 内跳过 GitHub API 查询。
@@ -58,7 +58,7 @@ tester 每门课对应一个独立 GitHub 仓库（如 `tinycs-cn/tinynum-tester
 ### 生命周期（`ensureTester(course) → (path, error)`）
 
 ```
-1. 读取本地缓存元数据：~/.tinycs/testers/<course>/meta.json
+1. 读取本地缓存元数据：~/.tinyforge/testers/<course>/meta.json
    { "version": "v0.4.0", "cached_at": "..." }
 
 2. 若缓存未超过 24h → 直接返回缓存路径
@@ -91,7 +91,7 @@ Windows 上改用 Docker 容器运行 tester，行为与服务端评测环境完
 ```bash
 docker run --rm \
   -v "<projectDir>:/workspace" \
-  ghcr.io/tinycs-cn/{course}-tester:<version> \
+  ghcr.io/tinyforge-cn/{course}-tester:<version> \
   -s <stage> -d /workspace
 ```
 
@@ -143,7 +143,7 @@ func TestCommand(args []string) error {
     if err != nil { return fmt.Errorf("加载配置失败: %w", err) }
     token := cfg.GetToken()
     if token == "" {
-        return errors.New("未登录，请先运行: tinycs login")
+        return errors.New("未登录，请先运行: tinyforge login")
     }
 
     course, language, projectDir, err := resolveProject()
@@ -185,12 +185,12 @@ const testerCacheTTL = 24 * time.Hour
 
 func ensureTester(course string) (string, error) {
     home, _ := os.UserHomeDir()
-    cacheDir   := filepath.Join(home, ".tinycs", "testers", course)
+    cacheDir   := filepath.Join(home, ".tinyforge", "testers", course)
     metaPath   := filepath.Join(cacheDir, "meta.json")
     testerPath := filepath.Join(cacheDir, "tester")
 
     // 1. 读本地 meta，若 cached_at 未超过 TTL 直接返回
-    // 2. GET https://api.github.com/repos/tinycs-cn/{course}-tester/releases/latest
+    // 2. GET https://api.github.com/repos/tinyforge-cn/{course}-tester/releases/latest
     // 3. 若版本一致，更新 cached_at 返回
     // 4. 构造下载 URL，按 runtime.GOOS+runtime.GOARCH 选平台
     // 5. 下载 → os.WriteFile → os.Chmod(testerPath, 0755) → 更新 meta
@@ -199,7 +199,7 @@ func ensureTester(course string) (string, error) {
 
 ### 注册命令
 
-在 `cmd/tinycs/main.go` 中添加：
+在 `cmd/tinyforge/main.go` 中添加：
 
 ```go
 case "test":
@@ -208,7 +208,7 @@ case "test":
 
 ---
 
-## 与 `tinycs submit` 集成（可选阶段二）
+## 与 `tinyforge submit` 集成（可选阶段二）
 
 `submit` 前自动跑本地测试，失败时提示：
 
@@ -232,7 +232,7 @@ case "test":
 ```
 GET /v1/current-stage?course=tinynum&language=python
 → 200: { slug: "storage-and-shape", ... }
-→ 400: freeform 课程 → 提示加 --stage <slug>（tinycs stages 查看列表）
+→ 400: freeform 课程 → 提示加 --stage <slug>（tinyforge stages 查看列表）
 → 404: 未注册该课程 → 提示先在网页端注册
 ```
 
@@ -246,7 +246,7 @@ GET /v1/current-stage?course=tinynum&language=python
 | ---- | -------------------------------------------------------------------------------- | ------------------- |
 | 1    | ~~扩展 tester release.yml，构建 4 平台二进制（去除 Windows）~~ ✅ 已完成         | tinynum-tester repo |
 | 2    | ~~实现 `ensureTester`（GitHub Releases 查询+缓存，macOS/Linux）~~ ✅ 已完成      | 步骤 1              |
-| 3    | ~~tinycs-api 新增 `GET /v1/current-stage?course=&language=`~~ ✅ 已完成          | —                   |
+| 3    | ~~tinyforge-api 新增 `GET /v1/current-stage?course=&language=`~~ ✅ 已完成          | —                   |
 | 4    | ~~实现 `TestCommand`~~ ✅ 已完成                                                 | 步骤 2、3           |
 | 5    | ~~注册到 main.go~~ ✅ 已完成                                                     | 步骤 4              |
 | 6    | submit 集成（可选）                                                              | 步骤 4              |

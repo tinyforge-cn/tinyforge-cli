@@ -1,11 +1,11 @@
 VERSION ?= dev
 COMMIT  ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-LDFLAGS := -s -w -X github.com/tinycs-cn/cli/internal/version.Version=$(VERSION) -X github.com/tinycs-cn/cli/internal/version.Commit=$(COMMIT)
+LDFLAGS := -s -w -X github.com/tinyforge-cn/cli/internal/version.Version=$(VERSION) -X github.com/tinyforge-cn/cli/internal/version.Commit=$(COMMIT)
 
 .PHONY: build test lint install clean snapshot release-check
 
 build:
-	go build -ldflags "$(LDFLAGS)" -o bin/tinycs ./cmd/tinycs
+	go build -ldflags "$(LDFLAGS)" -o bin/tinyforge ./cmd/tinyforge
 
 test:
 	go test ./... -v
@@ -14,7 +14,7 @@ lint:
 	go vet ./...
 
 install: build
-	cp bin/tinycs /usr/local/bin/tinycs
+	cp bin/tinyforge /usr/local/bin/tinyforge
 
 # 本地跑一次 goreleaser snapshot,产出多平台二进制到 dist/(无需 tag,无需 push)
 # 需要 brew install goreleaser

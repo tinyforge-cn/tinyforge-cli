@@ -1,4 +1,4 @@
-module github.com/tinycs-cn/cli
+module github.com/tinyforge-cn/cli
 
 go 1.23.0
 

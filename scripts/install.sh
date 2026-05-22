@@ -1,11 +1,11 @@
 #!/bin/sh
-# tinycs-cli installer for Linux and macOS
-# Usage: curl -fsSL https://github.com/tinycs-cn/tinycs-cli/releases/latest/download/install.sh | sh
+# tinyforge-cli installer for Linux and macOS
+# Usage: curl -fsSL https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/install.sh | sh
 set -e
 
-REPO="tinycs-cn/tinycs-cli"
+REPO="tinyforge-cn/tinyforge-cli"
 INSTALL_DIR="/usr/local/bin"
-BIN="tinycs"
+BIN="tinyforge"
 
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 arch=$(uname -m)
@@ -29,7 +29,7 @@ esac
 URL="https://github.com/${REPO}/releases/latest/download/${BIN}-${os}-${arch}"
 DEST="${INSTALL_DIR}/${BIN}"
 
-echo "Downloading tinycs ($os/$arch)..."
+echo "Downloading tinyforge ($os/$arch)..."
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "$URL" -o "$DEST"
 elif command -v wget >/dev/null 2>&1; then

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tinycs-cn/cli/internal/commands"
+	"github.com/tinyforge-cn/cli/internal/commands"
 )
 
 func main() {
@@ -47,13 +47,13 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`tinycs — Tinycs 平台 CLI 工具
+	fmt.Println(`tinyforge — Tinyforge 平台 CLI 工具
 
 用法:
-  tinycs <命令> [选项]
+  tinyforge <命令> [选项]
 
 命令:
-  login     登录 Tinycs 平台
+  login     登录 Tinyforge 平台
   submit    提交代码进行评测
   test      本地运行 tester 评测
   stages    列出当前课程的所有关卡 slug
@@ -63,13 +63,13 @@ func printUsage() {
   --help    显示帮助信息
 
 示例:
-  tinycs login                     浏览器授权登录
-  tinycs login --token tcs_xxx      使用 Token 登录
-  tinycs submit                    提交当前目录代码
-  tinycs submit --stage softmax    指定评测关卡
-  tinycs submit --dry-run          仅预览打包内容
-  tinycs stages                    列出当前课程所有关卡 slug
-  tinycs test                      本地评测当前关卡
-  tinycs test --stage softmax      本地评测指定关卡
-  tinycs test --all                本地评测所有关卡`)
+  tinyforge login                     浏览器授权登录
+  tinyforge login --token tcs_xxx      使用 Token 登录
+  tinyforge submit                    提交当前目录代码
+  tinyforge submit --stage softmax    指定评测关卡
+  tinyforge submit --dry-run          仅预览打包内容
+  tinyforge stages                    列出当前课程所有关卡 slug
+  tinyforge test                      本地评测当前关卡
+  tinyforge test --stage softmax      本地评测指定关卡
+  tinyforge test --all                本地评测所有关卡`)
 }
