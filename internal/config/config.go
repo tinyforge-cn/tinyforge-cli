@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultAPIURL = "https://api.tinyforge.cn"
+	DefaultAPIURL = "http://47.103.34.101"
 	configDirName = ".tinyforge"
 	configFile    = "config.yml"
 )
