@@ -8,14 +8,16 @@ import (
 )
 
 const (
-	DefaultAPIURL = "http://47.103.34.101"
-	configDirName = ".tinyforge"
-	configFile    = "config.yml"
+	DefaultAPIURL = "https://api.tinyforge.cn"
+	DefaultGitHost = "git.tinyforge.cn"
+	configDirName  = ".tinyforge"
+	configFile     = "config.yml"
 )
 
 type Config struct {
-	Token  string `yaml:"token,omitempty"`
-	APIURL string `yaml:"api_url,omitempty"`
+	Token   string `yaml:"token,omitempty"`
+	APIURL  string `yaml:"api_url,omitempty"`
+	GitHost string `yaml:"git_host,omitempty"`
 }
 
 func configDir() string {
@@ -69,4 +71,11 @@ func (c *Config) GetAPIURL(flagURL string) string {
 		return c.APIURL
 	}
 	return DefaultAPIURL
+}
+
+func (c *Config) GetGitHost() string {
+	if c.GitHost != "" {
+		return c.GitHost
+	}
+	return DefaultGitHost
 }

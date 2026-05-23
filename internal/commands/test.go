@@ -63,10 +63,12 @@ func TestCommand(args []string) error {
 	// 4. Resolve stage slug
 	stageSlug := *stage
 	if stageSlug == "" && !*all {
-		stageSlug, err = resolveCurrentStageFromAPI(course, language, cfg, *apiURL)
+		var stageName string
+		stageSlug, stageName, err = resolveCurrentStageFromAPI(course, language, cfg, *apiURL)
 		if err != nil {
 			return err
 		}
+		fmt.Printf("📍 当前关卡: %s (%s)\n", stageName, stageSlug)
 	}
 
 	// 5. Run tester
@@ -76,8 +78,8 @@ func TestCommand(args []string) error {
 }
 
 // resolveCurrentStageFromAPI calls GET /v1/current-stage?course=&language= and
-// returns the current stage slug. Produces user-friendly errors for 400/404.
-func resolveCurrentStageFromAPI(course, language string, cfg *config.Config, apiURL string) (string, error) {
+// returns the current stage slug and name. Produces user-friendly errors for 400/404.
+func resolveCurrentStageFromAPI(course, language string, cfg *config.Config, apiURL string) (string, string, error) {
 	baseURL := cfg.GetAPIURL(apiURL)
 	c := client.New(baseURL, cfg.GetToken())
 
@@ -87,16 +89,16 @@ func resolveCurrentStageFromAPI(course, language string, cfg *config.Config, api
 		if errors.As(err, &apiErr) {
 			switch apiErr.StatusCode {
 			case http.StatusBadRequest:
-				return "", fmt.Errorf(
+				return "", "", fmt.Errorf(
 					"该课程为随机挑战模式，请用 --stage <slug> 指定关卡\n运行 tinyforge stages 查看可用关卡",
 				)
 			case http.StatusNotFound:
-				return "", fmt.Errorf(
+				return "", "", fmt.Errorf(
 					"未找到该课程的注册记录，请先到 https://www.tinyforge.cn 注册仓库后再运行",
 				)
 			}
 		}
-		return "", fmt.Errorf("获取当前关卡失败: %w", err)
+		return "", "", fmt.Errorf("获取当前关卡失败: %w", err)
 	}
-	return item.Slug, nil
+	return item.Slug, item.Name, nil
 }

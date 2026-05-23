@@ -74,7 +74,7 @@ func SubmitCommand(args []string) error {
 	}
 
 	// 3. Ensure tinyforge remote exists (clean URL, no token)
-	if err := ensureTinyforgeRemote(projectDir, course, language); err != nil {
+	if err := ensureTinyforgeRemote(projectDir, course, language, cfg.GetGitHost()); err != nil {
 		return err
 	}
 
@@ -117,7 +117,7 @@ func SubmitCommand(args []string) error {
 
 	// 6. git push (token embedded in remote URL, restored by withTokenRemote's defer)
 	ui.Println("🚀 推送到 Tinyforge...")
-	pushErr := withTokenRemote(projectDir, token, course, language, func() error {
+	pushErr := withTokenRemote(projectDir, token, course, language, cfg.GetGitHost(), func() error {
 		return runGitPush(projectDir)
 	})
 	if pushErr != nil {

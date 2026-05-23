@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -155,12 +156,29 @@ func setGitRemoteURL(dir, remote, rawURL string) error {
 	return runGitCmd(dir, "remote", "set-url", remote, rawURL)
 }
 
+// gitScheme returns "http" for bare IP addresses, "https" otherwise.
+func gitScheme(host string) string {
+	// net.ParseIP accepts both IPv4 and IPv6
+	if net.ParseIP(host) != nil {
+		return "http"
+	}
+	return "https"
+}
+
 // ensureTinyforgeRemote makes sure the "tinyforge" remote exists in dir with
 // the canonical clean URL (no embedded token).  It creates the remote if
 // absent, or normalises the URL if it was left with a token from a previous
 // interrupted push.
-func ensureTinyforgeRemote(dir, course, language string) error {
-	cleanURL := fmt.Sprintf("https://git.tinyforge.cn/%s-%s.git", course, language)
+func ensureTinyforgeRemote(dir, course, language, gitHost string) error {
+	scheme := gitScheme(gitHost)
+	// For bare IP hosts use /git/ prefix (standard route); for domain hosts
+	// use the short-path /{slug}.git (served via Host middleware on git.tinyforge.cn)
+	var cleanURL string
+	if net.ParseIP(gitHost) != nil {
+		cleanURL = fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
+	} else {
+		cleanURL = fmt.Sprintf("%s://%s/%s-%s.git", scheme, gitHost, course, language)
+	}
 	existing := runGit(dir, "remote", "get-url", "tinyforge")
 	if existing == "" {
 		if err := runGitCmd(dir, "remote", "add", "tinyforge", cleanURL); err != nil {
@@ -179,9 +197,16 @@ func ensureTinyforgeRemote(dir, course, language string) error {
 // withTokenRemote temporarily embeds the auth token in the "tinyforge" remote
 // URL, calls fn(), then restores the clean URL via defer — so the token is
 // never stored persistently in .git/config.
-func withTokenRemote(dir, token, course, language string, fn func() error) error {
-	authURL := fmt.Sprintf("https://x:%s@git.tinyforge.cn/%s-%s.git", token, course, language)
-	cleanURL := fmt.Sprintf("https://git.tinyforge.cn/%s-%s.git", course, language)
+func withTokenRemote(dir, token, course, language, gitHost string, fn func() error) error {
+	scheme := gitScheme(gitHost)
+	var authURL, cleanURL string
+	if net.ParseIP(gitHost) != nil {
+		authURL = fmt.Sprintf("%s://x:%s@%s/git/%s-%s.git", scheme, token, gitHost, course, language)
+		cleanURL = fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
+	} else {
+		authURL = fmt.Sprintf("%s://x:%s@%s/%s-%s.git", scheme, token, gitHost, course, language)
+		cleanURL = fmt.Sprintf("%s://%s/%s-%s.git", scheme, gitHost, course, language)
+	}
 	if err := setGitRemoteURL(dir, "tinyforge", authURL); err != nil {
 		return fmt.Errorf("设置 remote URL 失败: %w", err)
 	}
