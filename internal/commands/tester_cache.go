@@ -83,7 +83,8 @@ func ensureTesterBinary(course string) (testerRunner, error) {
 	if err != nil {
 		return nil, err
 	}
-	fname := fmt.Sprintf("%s-tester-%s", course, platform)
+	repoName := course + "-tester"
+	fname := fmt.Sprintf("%s-%s", repoName, platform)
 	dlURL := fmt.Sprintf(
 		"https://github.com/tinyforge-cn/%s-tester/releases/download/%s/%s",
 		course, latest, fname,
