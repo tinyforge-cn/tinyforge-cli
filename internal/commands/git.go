@@ -171,14 +171,7 @@ func gitScheme(host string) string {
 // interrupted push.
 func ensureTinyforgeRemote(dir, course, language, gitHost string) error {
 	scheme := gitScheme(gitHost)
-	// For bare IP hosts use /git/ prefix (standard route); for domain hosts
-	// use the short-path /{slug}.git (served via Host middleware on git.tinyforge.cn)
-	var cleanURL string
-	if net.ParseIP(gitHost) != nil {
-		cleanURL = fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
-	} else {
-		cleanURL = fmt.Sprintf("%s://%s/%s-%s.git", scheme, gitHost, course, language)
-	}
+	cleanURL := fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
 	existing := runGit(dir, "remote", "get-url", "tinyforge")
 	if existing == "" {
 		if err := runGitCmd(dir, "remote", "add", "tinyforge", cleanURL); err != nil {
@@ -199,14 +192,8 @@ func ensureTinyforgeRemote(dir, course, language, gitHost string) error {
 // never stored persistently in .git/config.
 func withTokenRemote(dir, token, course, language, gitHost string, fn func() error) error {
 	scheme := gitScheme(gitHost)
-	var authURL, cleanURL string
-	if net.ParseIP(gitHost) != nil {
-		authURL = fmt.Sprintf("%s://x:%s@%s/git/%s-%s.git", scheme, token, gitHost, course, language)
-		cleanURL = fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
-	} else {
-		authURL = fmt.Sprintf("%s://x:%s@%s/%s-%s.git", scheme, token, gitHost, course, language)
-		cleanURL = fmt.Sprintf("%s://%s/%s-%s.git", scheme, gitHost, course, language)
-	}
+	authURL := fmt.Sprintf("%s://x:%s@%s/git/%s-%s.git", scheme, token, gitHost, course, language)
+	cleanURL := fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
 	if err := setGitRemoteURL(dir, "tinyforge", authURL); err != nil {
 		return fmt.Errorf("设置 remote URL 失败: %w", err)
 	}
