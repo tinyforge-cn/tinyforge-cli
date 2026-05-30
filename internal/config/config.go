@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	DefaultAPIURL  = "https://api.tinyforge.cn"
-	DefaultGitHost = "git.tinyforge.cn"
-	configDirName  = ".tinyforge"
+	DefaultAPIURL  = "https://api.bytecafe.cn"
+	DefaultGitHost = "git.bytecafe.cn"
+	configDirName  = ".bytecafe"
 	configFile     = "config.yml"
 )
 
@@ -57,7 +57,7 @@ func (c *Config) Save() error {
 }
 
 func (c *Config) GetToken() string {
-	if env := os.Getenv("TINYFORGE_TOKEN"); env != "" {
+	if env := os.Getenv("BYTECAFE_TOKEN"); env != "" {
 		return env
 	}
 	return c.Token

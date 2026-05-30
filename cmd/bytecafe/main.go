@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tinyforge-cn/cli/internal/commands"
+	"github.com/bytecafe-run/cli/internal/commands"
 )
 
 func main() {
@@ -47,13 +47,13 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`tinyforge — Tinyforge 平台 CLI 工具
+	fmt.Println(`bytecafe — ByteCafe 平台 CLI 工具
 
 用法:
-  tinyforge <命令> [选项]
+  bytecafe <命令> [选项]
 
 命令:
-  login     登录 Tinyforge 平台
+  login     登录 ByteCafe 平台
   submit    提交代码进行评测
   test      本地运行 tester 评测
   stages    列出当前课程的所有关卡 slug
@@ -63,13 +63,13 @@ func printUsage() {
   --help    显示帮助信息
 
 示例:
-  tinyforge login                     浏览器授权登录
-  tinyforge login --token tcs_xxx      使用 Token 登录
-  tinyforge submit                    提交当前目录代码
-  tinyforge submit --stage softmax    指定评测关卡
-  tinyforge submit --dry-run          仅预览打包内容
-  tinyforge stages                    列出当前课程所有关卡 slug
-  tinyforge test                      本地评测当前关卡
-  tinyforge test --stage softmax      本地评测指定关卡
-  tinyforge test --all                本地评测所有关卡`)
+  bytecafe login                     浏览器授权登录
+  bytecafe login --token tcs_xxx      使用 Token 登录
+  bytecafe submit                    提交当前目录代码
+  bytecafe submit --stage softmax    指定评测关卡
+  bytecafe submit --dry-run          仅预览打包内容
+  bytecafe stages                    列出当前课程所有关卡 slug
+  bytecafe test                      本地评测当前关卡
+  bytecafe test --stage softmax      本地评测指定关卡
+  bytecafe test --all                本地评测所有关卡`)
 }

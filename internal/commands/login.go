@@ -8,9 +8,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/tinyforge-cn/cli/internal/client"
-	"github.com/tinyforge-cn/cli/internal/config"
-	"github.com/tinyforge-cn/cli/internal/ui"
+	"github.com/bytecafe-run/cli/internal/client"
+	"github.com/bytecafe-run/cli/internal/config"
+	"github.com/bytecafe-run/cli/internal/ui"
 )
 
 func LoginCommand(args []string) error {
@@ -90,13 +90,13 @@ func pollForToken(c *client.Client, code string, expiresIn int) (token, username
 		case "success":
 			return result.Token, result.Username, nil
 		case "expired":
-			return "", "", errors.New("授权超时，请重新运行 tinyforge login")
+			return "", "", errors.New("授权超时，请重新运行 bytecafe login")
 		}
 
 		time.Sleep(1 * time.Second)
 		ui.Print(".")
 	}
-	return "", "", errors.New("等待超时，请重新运行 tinyforge login")
+	return "", "", errors.New("等待超时，请重新运行 bytecafe login")
 }
 
 func openBrowser(url string) {

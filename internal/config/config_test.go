@@ -22,7 +22,7 @@ func TestSaveAndLoad(t *testing.T) {
 	}
 
 	// Check file permissions (Windows 不支持 POSIX 权限位)
-	info, err := os.Stat(filepath.Join(tmpDir, ".tinyforge", "config.yml"))
+	info, err := os.Stat(filepath.Join(tmpDir, ".bytecafe", "config.yml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestLoadNonExistent(t *testing.T) {
 
 func TestGetToken_EnvOverride(t *testing.T) {
 	cfg := &Config{Token: "from_config"}
-	t.Setenv("TINYFORGE_TOKEN", "from_env")
+	t.Setenv("BYTECAFE_TOKEN", "from_env")
 
 	got := cfg.GetToken()
 	if got != "from_env" {

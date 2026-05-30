@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/tinyforge-cn/cli/internal/client"
-	"github.com/tinyforge-cn/cli/internal/config"
+	"github.com/bytecafe-run/cli/internal/client"
+	"github.com/bytecafe-run/cli/internal/config"
 )
 
-// StagesCommand implements "tinyforge stages".
+// StagesCommand implements "bytecafe stages".
 // Reads the current project's course slug (via resolveProject) then calls
 // GET /v1/courses/{slug} to list all stage slugs with their positions and names.
 func StagesCommand(args []string) error {

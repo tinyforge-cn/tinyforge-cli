@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tinyforge-cn/cli/internal/client"
+	"github.com/bytecafe-run/cli/internal/client"
 )
 
 func TestRenderResult_BusyLogs(t *testing.T) {

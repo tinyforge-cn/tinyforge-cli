@@ -67,7 +67,7 @@ func TestInitCLIAuth(t *testing.T) {
 		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(map[string]any{
 			"code":      "tcs_tmp_abc123",
-			"authUrl":   "https://tinyforge.cn/cli-auth?code=tcs_tmp_abc123",
+			"authUrl":   "https://bytecafe.cn/cli-auth?code=tcs_tmp_abc123",
 			"expiresIn": 300,
 		})
 	}))

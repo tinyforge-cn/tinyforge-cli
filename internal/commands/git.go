@@ -51,12 +51,12 @@ func runGitCmd(dir string, args ...string) error {
 	return nil
 }
 
-// runGitPush runs "git push tinyforge HEAD:main" in dir.
+// runGitPush runs "git push bytecafe HEAD:main" in dir.
 // Git output (progress lines) is suppressed for a clean CLI UX.
 // On failure, returns *gitPushError with the captured stderr.
 func runGitPush(dir string) error {
 	var stderrBuf bytes.Buffer
-	cmd := exec.Command("git", "push", "tinyforge", "HEAD:main")
+	cmd := exec.Command("git", "push", "bytecafe", "HEAD:main")
 	cmd.Dir = dir
 	cmd.Stdout = io.Discard
 	cmd.Stderr = &stderrBuf
@@ -89,17 +89,17 @@ func formatPushError(err error, course, language string) error {
 		}
 		return errors.New("❌ 该关卡尚未解锁，请先在网页点击「完成本关」解锁下一关")
 	case strings.Contains(s, "non-fast-forward"):
-		return errors.New("❌ 推送被拒绝（non-fast-forward）\n   请运行: git pull tinyforge main --rebase")
+		return errors.New("❌ 推送被拒绝（non-fast-forward）\n   请运行: git pull bytecafe main --rebase")
 	case strings.Contains(s, "rejected"):
 		return fmt.Errorf("❌ 推送被拒绝:\n%s", strings.TrimSpace(s))
 	case strings.Contains(s, "Authentication failed") ||
 		strings.Contains(s, "403") || strings.Contains(s, "401"):
-		return errors.New("❌ 认证失败，请重新登录: tinyforge login")
+		return errors.New("❌ 认证失败，请重新登录: bytecafe login")
 	case strings.Contains(s, "server busy"):
 		return errors.New("❌ 服务器繁忙，请稍后重试")
 	case strings.Contains(s, "not found") || strings.Contains(s, "仓库不存在"):
 		return fmt.Errorf(
-			"❌ 推送失败：未找到仓库记录（%s / %s）\n   请先前往 https://www.tinyforge.cn 创建该课程的仓库，再重新提交",
+			"❌ 推送失败：未找到仓库记录（%s / %s）\n   请先前往 https://www.bytecafe.cn 创建该课程的仓库，再重新提交",
 			course, language,
 		)
 	default:
@@ -122,9 +122,9 @@ func gitRootDir(startDir string) (string, error) {
 	return strings.TrimSpace(out.String()), nil
 }
 
-// parseRepoSlug extracts course and language from a tinyforge remote URL.
+// parseRepoSlug extracts course and language from a bytecafe remote URL.
 //
-//	"https://git.tinyforge.cn/tinydsa-java.git" → ("tinydsa", "java")
+//	"https://git.bytecafe.cn/tinydsa-java.git" → ("tinydsa", "java")
 //
 // Uses strings.LastIndex("-") identical to the server's ParseRepoSlug logic,
 // so "my-course-go" correctly yields ("my-course", "go").
@@ -146,7 +146,7 @@ var tokenRe = regexp.MustCompile(`(https?://)([^@]+@)`)
 
 // stripToken removes embedded credentials from a git remote URL.
 //
-//	"https://x:TOKEN@git.tinyforge.cn/..." → "https://git.tinyforge.cn/..."
+//	"https://x:TOKEN@git.bytecafe.cn/..." → "https://git.bytecafe.cn/..."
 func stripToken(rawURL string) string {
 	return tokenRe.ReplaceAllString(rawURL, "$1")
 }
@@ -165,39 +165,39 @@ func gitScheme(host string) string {
 	return "https"
 }
 
-// ensureTinyforgeRemote makes sure the "tinyforge" remote exists in dir with
+// ensureBytecafeRemote makes sure the "bytecafe" remote exists in dir with
 // the canonical clean URL (no embedded token).  It creates the remote if
 // absent, or normalises the URL if it was left with a token from a previous
 // interrupted push.
-func ensureTinyforgeRemote(dir, course, language, gitHost string) error {
+func ensureBytecafeRemote(dir, course, language, gitHost string) error {
 	scheme := gitScheme(gitHost)
 	cleanURL := fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
-	existing := runGit(dir, "remote", "get-url", "tinyforge")
+	existing := runGit(dir, "remote", "get-url", "bytecafe")
 	if existing == "" {
-		if err := runGitCmd(dir, "remote", "add", "tinyforge", cleanURL); err != nil {
-			return fmt.Errorf("添加 tinyforge remote 失败: %w", err)
+		if err := runGitCmd(dir, "remote", "add", "bytecafe", cleanURL); err != nil {
+			return fmt.Errorf("添加 bytecafe remote 失败: %w", err)
 		}
 		return nil
 	}
 	if stripToken(existing) != cleanURL {
-		if err := setGitRemoteURL(dir, "tinyforge", cleanURL); err != nil {
-			return fmt.Errorf("更新 tinyforge remote 失败: %w", err)
+		if err := setGitRemoteURL(dir, "bytecafe", cleanURL); err != nil {
+			return fmt.Errorf("更新 bytecafe remote 失败: %w", err)
 		}
 	}
 	return nil
 }
 
-// withTokenRemote temporarily embeds the auth token in the "tinyforge" remote
+// withTokenRemote temporarily embeds the auth token in the "bytecafe" remote
 // URL, calls fn(), then restores the clean URL via defer — so the token is
 // never stored persistently in .git/config.
 func withTokenRemote(dir, token, course, language, gitHost string, fn func() error) error {
 	scheme := gitScheme(gitHost)
 	authURL := fmt.Sprintf("%s://x:%s@%s/git/%s-%s.git", scheme, token, gitHost, course, language)
 	cleanURL := fmt.Sprintf("%s://%s/git/%s-%s.git", scheme, gitHost, course, language)
-	if err := setGitRemoteURL(dir, "tinyforge", authURL); err != nil {
+	if err := setGitRemoteURL(dir, "bytecafe", authURL); err != nil {
 		return fmt.Errorf("设置 remote URL 失败: %w", err)
 	}
-	defer setGitRemoteURL(dir, "tinyforge", cleanURL) //nolint:errcheck
+	defer setGitRemoteURL(dir, "bytecafe", cleanURL) //nolint:errcheck
 	return fn()
 }
 
@@ -307,7 +307,7 @@ func checkStagedFiles(dir string) error {
 		if extra > 0 {
 			sb.WriteString(fmt.Sprintf("   ... 还有 %d 个文件\n", extra))
 		}
-		sb.WriteString("\n请将这些路径添加到 .gitignore 后重新运行 tinyforge submit\n")
+		sb.WriteString("\n请将这些路径添加到 .gitignore 后重新运行 bytecafe submit\n")
 		sb.WriteString("例如：echo 'node_modules/' >> .gitignore")
 	}
 

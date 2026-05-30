@@ -1,4 +1,4 @@
-module github.com/tinyforge-cn/cli
+module github.com/bytecafe-run/cli
 
 go 1.23.0
 

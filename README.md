@@ -1,38 +1,38 @@
-# tinyforge-cli
+# bytecafe-cli
 
-[![CI](https://github.com/tinyforge-cn/tinyforge-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/tinyforge-cn/tinyforge-cli/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/tinyforge-cn/tinyforge-cli?logo=github)](https://github.com/tinyforge-cn/tinyforge-cli/releases/latest)
+[![CI](https://github.com/bytecafe-run/bytecafe-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/bytecafe-run/bytecafe-cli/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/bytecafe-run/bytecafe-cli?logo=github)](https://github.com/bytecafe-run/bytecafe-cli/releases/latest)
 
-Tinyforge 平台命令行工具，用于提交课程代码并获取实时评测结果。
+ByteCafe 平台命令行工具，用于提交课程代码并获取实时评测结果。
 
 ## 安装
 
 ### macOS / Linux（推荐）
 
 ```bash
-curl -fsSL https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/bytecafe-run/bytecafe-cli/releases/latest/download/install.sh | sh
 ```
 
 ### Windows（PowerShell）
 
 ```powershell
-irm https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/tinyforge-windows-amd64.exe -OutFile "$env:USERPROFILE\tinyforge.exe"
+irm https://github.com/bytecafe-run/bytecafe-cli/releases/latest/download/bytecafe-windows-amd64.exe -OutFile "$env:USERPROFILE\bytecafe.exe"
 ```
 
-> 下载后将 `tinyforge.exe` 所在目录加入系统 PATH，或移动到已在 PATH 中的目录。
+> 下载后将 `bytecafe.exe` 所在目录加入系统 PATH，或移动到已在 PATH 中的目录。
 
-> **`tinyforge test` 在 Windows 上通过 Docker 容器运行评测器，需安装 [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) 并确保其已启动。**
+> **`bytecafe test` 在 Windows 上通过 Docker 容器运行评测器，需安装 [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) 并确保其已启动。**
 
 ### 从源码构建（需 Go 1.23+，三端通用）
 
 ```bash
-go install github.com/tinyforge-cn/tinyforge-cli/cmd/tinyforge@latest
+go install github.com/bytecafe-run/bytecafe-cli/cmd/bytecafe@latest
 ```
 
 安装完成后验证：
 
 ```bash
-tinyforge version
+bytecafe version
 ```
 
 ## 快速上手
@@ -41,15 +41,15 @@ tinyforge version
 
 ```bash
 # 浏览器授权登录（推荐）
-tinyforge login
+bytecafe login
 
 # 或使用 Token 登录
-tinyforge login --token tcs_xxx
+bytecafe login --token tcs_xxx
 ```
 
 ### 2. 进入课程目录
 
-课程目录中需要有 `tinyforge.yml` 文件：
+课程目录中需要有 `bytecafe.yml` 文件：
 
 ```yaml
 course: tinydsa
@@ -59,20 +59,20 @@ language: python
 ### 3. 提交代码
 
 ```bash
-tinyforge submit
+bytecafe submit
 ```
 
 提交后 CLI 会实时输出评测日志，评测通过时自动解锁下一关。
 
 ## 命令参考
 
-### `tinyforge login`
+### `bytecafe login`
 
 | 选项              | 说明                                |
 | ----------------- | ----------------------------------- |
 | `--token <token>` | 使用 API Token 登录，跳过浏览器授权 |
 
-### `tinyforge submit`
+### `bytecafe submit`
 
 | 选项              | 说明                   |
 | ----------------- | ---------------------- |
@@ -80,7 +80,7 @@ tinyforge submit
 | `--dry-run`       | 仅预览打包文件，不上传 |
 | `--message <msg>` | 自定义提交备注         |
 
-### `tinyforge test`
+### `bytecafe test`
 
 在本地运行评测（结果不计入提交记录）。
 
@@ -91,17 +91,17 @@ tinyforge submit
 | `--docker`             | 强制使用 Docker 容器运行 tester（macOS/Linux 可选，Windows 默认） |
 | `--tester-path <path>` | 直接指定本地 tester 路径（调试用）                                |
 
-tester 按课程独立缓存在 `~/.tinyforge/testers/<course>/`，首次运行自动从 GitHub Releases 下载，24 小时内复用缓存。Windows 上改用 Docker 镜像（`ghcr.io/tinyforge-cn/<course>-tester`），无需下载二进制。
+tester 按课程独立缓存在 `~/.bytecafe/testers/<course>/`，首次运行自动从 GitHub Releases 下载，24 小时内复用缓存。Windows 上改用 Docker 镜像（`ghcr.io/bytecafe-run/<course>-tester`），无需下载二进制。
 
-### `tinyforge stages`
+### `bytecafe stages`
 
 列出当前课程的所有关卡序号、Slug 和名称。
 
 ```bash
-tinyforge stages
+bytecafe stages
 ```
 
-### `tinyforge version`
+### `bytecafe version`
 
 显示版本号和构建信息。
 
@@ -123,12 +123,12 @@ tinyforge stages
 
 | 变量           | 说明                                   |
 | -------------- | -------------------------------------- |
-| `TINYFORGE_TOKEN` | API Token，优先于配置文件（适用于 CI） |
+| `BYTECAFE_TOKEN` | API Token，优先于配置文件（适用于 CI） |
 | `NO_COLOR`     | 设置后禁用彩色输出                     |
 
 ## 配置文件
 
-登录后凭证保存在 `~/.tinyforge/config.yml`（权限 `0600`）。
+登录后凭证保存在 `~/.bytecafe/config.yml`（权限 `0600`）。
 
 ## 发布流程（维护者）
 
@@ -142,7 +142,7 @@ tinyforge stages
 
 3. `.github/workflows/release.yml` 会自动跑 GoReleaser，产出多平台二进制 + checksums，发到 GitHub Releases
 
-4. 学员 starter 的 `tinyforge-submit.yml`，发布后立刻生效
+4. 学员 starter 的 `bytecafe-submit.yml`，发布后立刻生效
 
 **本地预演**（无需打 tag、不会 push）：
 

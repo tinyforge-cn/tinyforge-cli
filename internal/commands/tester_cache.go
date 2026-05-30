@@ -28,8 +28,8 @@ const testerCacheTTL = 24 * time.Hour
 //
 // Cache layout (macOS/Linux):
 //
-//	~/.tinyforge/testers/<course>/tester        (binary)
-//	~/.tinyforge/testers/<course>/meta.json     (version + cached_at)
+//	~/.bytecafe/testers/<course>/tester        (binary)
+//	~/.bytecafe/testers/<course>/meta.json     (version + cached_at)
 func ensureTester(course string, useDocker bool) (testerRunner, error) {
 	if useDocker || runtime.GOOS == "windows" {
 		return ensureTesterDocker(course)
@@ -39,7 +39,7 @@ func ensureTester(course string, useDocker bool) (testerRunner, error) {
 
 func ensureTesterBinary(course string) (testerRunner, error) {
 	home, _ := os.UserHomeDir()
-	cacheDir := filepath.Join(home, ".tinyforge", "testers", course)
+	cacheDir := filepath.Join(home, ".bytecafe", "testers", course)
 	metaPath := filepath.Join(cacheDir, "meta.json")
 	testerPath := filepath.Join(cacheDir, "tester")
 
@@ -86,7 +86,7 @@ func ensureTesterBinary(course string) (testerRunner, error) {
 	repoName := course + "-tester"
 	fname := fmt.Sprintf("%s-%s", repoName, platform)
 	dlURL := fmt.Sprintf(
-		"https://github.com/tinyforge-cn/%s-tester/releases/download/%s/%s",
+		"https://github.com/bytecafe-run/%s-tester/releases/download/%s/%s",
 		course, latest, fname,
 	)
 
@@ -106,7 +106,7 @@ func ensureTesterBinary(course string) (testerRunner, error) {
 // The Docker image is pulled on demand by the Docker daemon — no local caching needed here.
 func ensureTesterDocker(course string) (testerRunner, error) {
 	home, _ := os.UserHomeDir()
-	metaPath := filepath.Join(home, ".tinyforge", "testers", course, "meta.json")
+	metaPath := filepath.Join(home, ".bytecafe", "testers", course, "meta.json")
 
 	var meta testerMeta
 	if data, err := os.ReadFile(metaPath); err == nil {
@@ -137,7 +137,7 @@ func ensureTesterDocker(course string) (testerRunner, error) {
 
 func fetchLatestTesterRelease(course string) (string, error) {
 	url := fmt.Sprintf(
-		"https://api.github.com/repos/tinyforge-cn/%s-tester/releases/latest",
+		"https://api.github.com/repos/bytecafe-run/%s-tester/releases/latest",
 		course,
 	)
 	req, err := http.NewRequest("GET", url, nil)

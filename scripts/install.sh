@@ -1,11 +1,11 @@
 #!/bin/sh
-# tinyforge-cli installer for Linux and macOS
-# Usage: curl -fsSL https://github.com/tinyforge-cn/tinyforge-cli/releases/latest/download/install.sh | sh
+# bytecafe-cli installer for Linux and macOS
+# Usage: curl -fsSL https://github.com/bytecafe-run/bytecafe-cli/releases/latest/download/install.sh | sh
 set -e
 
-REPO="tinyforge-cn/tinyforge-cli"
+REPO="bytecafe-run/bytecafe-cli"
 INSTALL_DIR="/usr/local/bin"
-BIN="tinyforge"
+BIN="bytecafe"
 
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 arch=$(uname -m)
@@ -29,7 +29,7 @@ esac
 URL="https://github.com/${REPO}/releases/latest/download/${BIN}-${os}-${arch}"
 DEST="${INSTALL_DIR}/${BIN}"
 
-echo "Downloading tinyforge ($os/$arch)..."
+echo "Downloading bytecafe ($os/$arch)..."
 if command -v curl >/dev/null 2>&1; then
   curl -fsSL "$URL" -o "$DEST"
 elif command -v wget >/dev/null 2>&1; then
