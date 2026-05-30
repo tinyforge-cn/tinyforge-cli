@@ -64,7 +64,7 @@ func printUsage() {
 
 示例:
   bytecafe login                     浏览器授权登录
-  bytecafe login --token tcs_xxx      使用 Token 登录
+  bytecafe login --token bc_xxx      使用 Token 登录
   bytecafe submit                    提交当前目录代码
   bytecafe submit --stage softmax    指定评测关卡
   bytecafe submit --dry-run          仅预览打包内容

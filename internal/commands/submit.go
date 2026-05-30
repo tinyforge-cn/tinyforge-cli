@@ -190,7 +190,7 @@ func resolveProject() (course, language, projectDir string, err error) {
 
 	return "", "", "", errors.New(
 		"找不到 ByteCafe remote，请在课程目录中运行，\n" +
-			"或先到 https://www.bytecafe.cn 创建仓库后克隆模版",
+			"或先到 https://www.bytecafe.run 创建仓库后克隆模版",
 	)
 }
 
@@ -427,7 +427,7 @@ func renderResult(result *client.SubmissionStatusResponse, skipLogs bool) error 
 		ui.Success(fmt.Sprintf("✅ %s「%s」通过！%s", result.StageSlug, result.StageName, durationStr))
 		if result.StagePosition > 0 && result.CourseSlug != "" && result.CourseTrack != "" && result.Language != "" {
 			fmt.Println()
-			url := fmt.Sprintf("https://www.bytecafe.cn/courses/%s/%s/repos/%s/stages/%d",
+			url := fmt.Sprintf("https://www.bytecafe.run/courses/%s/%s/repos/%s/stages/%d",
 				trackURLPath(result.CourseTrack), result.CourseSlug, result.Language, result.StagePosition)
 			ui.Info(fmt.Sprintf("👉 前往网页点击「完成本关」解锁下一关：%s", url))
 		}

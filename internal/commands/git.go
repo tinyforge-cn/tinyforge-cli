@@ -99,7 +99,7 @@ func formatPushError(err error, course, language string) error {
 		return errors.New("❌ 服务器繁忙，请稍后重试")
 	case strings.Contains(s, "not found") || strings.Contains(s, "仓库不存在"):
 		return fmt.Errorf(
-			"❌ 推送失败：未找到仓库记录（%s / %s）\n   请先前往 https://www.bytecafe.cn 创建该课程的仓库，再重新提交",
+			"❌ 推送失败：未找到仓库记录（%s / %s）\n   请先前往 https://www.bytecafe.run 创建该课程的仓库，再重新提交",
 			course, language,
 		)
 	default:
@@ -124,7 +124,7 @@ func gitRootDir(startDir string) (string, error) {
 
 // parseRepoSlug extracts course and language from a bytecafe remote URL.
 //
-//	"https://git.bytecafe.cn/tinydsa-java.git" → ("tinydsa", "java")
+//	"https://git.bytecafe.run/tinydsa-java.git" → ("tinydsa", "java")
 //
 // Uses strings.LastIndex("-") identical to the server's ParseRepoSlug logic,
 // so "my-course-go" correctly yields ("my-course", "go").
@@ -146,7 +146,7 @@ var tokenRe = regexp.MustCompile(`(https?://)([^@]+@)`)
 
 // stripToken removes embedded credentials from a git remote URL.
 //
-//	"https://x:TOKEN@git.bytecafe.cn/..." → "https://git.bytecafe.cn/..."
+//	"https://x:TOKEN@git.bytecafe.run/..." → "https://git.bytecafe.run/..."
 func stripToken(rawURL string) string {
 	return tokenRe.ReplaceAllString(rawURL, "$1")
 }

@@ -14,7 +14,7 @@ func TestSaveAndLoad(t *testing.T) {
 	t.Setenv("USERPROFILE", tmpDir) // Windows uses USERPROFILE
 
 	cfg := &Config{
-		Token:  "tcs_test123",
+		Token:  "bc_test123",
 		APIURL: "https://test.example.com",
 	}
 	if err := cfg.Save(); err != nil {
@@ -36,8 +36,8 @@ func TestSaveAndLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if loaded.Token != "tcs_test123" {
-		t.Errorf("expected token tcs_test123, got %q", loaded.Token)
+	if loaded.Token != "bc_test123" {
+		t.Errorf("expected token bc_test123, got %q", loaded.Token)
 	}
 	if loaded.APIURL != "https://test.example.com" {
 		t.Errorf("expected api_url https://test.example.com, got %q", loaded.APIURL)

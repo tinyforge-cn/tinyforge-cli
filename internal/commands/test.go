@@ -94,7 +94,7 @@ func resolveCurrentStageFromAPI(course, language string, cfg *config.Config, api
 				)
 			case http.StatusNotFound:
 				return "", "", fmt.Errorf(
-					"未找到该课程的注册记录，请先到 https://www.bytecafe.cn 注册仓库后再运行",
+					"未找到该课程的注册记录，请先到 https://www.bytecafe.run 注册仓库后再运行",
 				)
 			}
 		}

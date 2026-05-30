@@ -44,7 +44,7 @@ bytecafe version
 bytecafe login
 
 # 或使用 Token 登录
-bytecafe login --token tcs_xxx
+bytecafe login --token bc_xxx
 ```
 
 ### 2. 进入课程目录

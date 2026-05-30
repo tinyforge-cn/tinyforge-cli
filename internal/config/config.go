@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	DefaultAPIURL  = "https://api.bytecafe.cn"
-	DefaultGitHost = "git.bytecafe.cn"
+	DefaultAPIURL  = "https://api.bytecafe.run"
+	DefaultGitHost = "git.bytecafe.run"
 	configDirName  = ".bytecafe"
 	configFile     = "config.yml"
 )
